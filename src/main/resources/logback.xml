@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.hibernate.engine.transaction" level="DEBUG"/>
+    <logger name="chatikam" level="DEBUG"/>
+    <logger name="jdbc" level="OFF"/>
+    <logger name="jdbc.sqltiming" level="DEBUG"/>
+    <logger name="jdbc.resultsettable" level="ERROR"/>
+</configuration>

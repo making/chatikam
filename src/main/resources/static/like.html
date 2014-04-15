@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello STOMP</title>
+    <meta charset="UTF-8">
+    <link href="vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="vendor/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 30px;
+        }
+
+        .panel {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="container">
+    <h2>STOMP Demo</h2>
+
+    <div class="row">
+        <button id="connect" class="btn btn-info" title="Connect">
+            <span class="glyphicon glyphicon-play"></span>
+        </button>
+        <button id="disconnect" class="btn btn-danger" title="Disconnect">
+            <span class="glyphicon glyphicon-stop"></span>
+        </button>
+        <button id="like" class="btn btn-default">
+            Like! <span class="glyphicon glyphicon-thumbs-up"></span>
+        </button>
+    </div>
+    <div class="row">
+        <div class="panel panel-success">
+            <div class="panel-heading">Response</div>
+            <div id="result" class="panel-body"></div>
+        </div>
+    </div>
+</div>
+
+<script src="vendor/sockjs/sockjs.js"></script>
+<script src="vendor/stomp-websocket/lib/stomp.js"></script>
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/lodash/dist/lodash.min.js"></script>
+<script src="vendor/backbone/backbone-min.js"></script>
+<script>
+    var AppView = Backbone.View.extend({
+        el: $('#app'),
+        events: {
+            'click #connect': 'connect',
+            'click #disconnect': 'disconnect',
+            'click #like': 'like'
+        },
+        initialize: function () {
+            this.connected = false;
+            this.$connect = this.$('#connect');
+            this.$disconnect = this.$('#disconnect');
+            this.$like = this.$('#like');
+            this.$result = this.$('#result');
+            this.setButtonState(false);
+        },
+        connect: function () {
+            var socket = new SockJS('/like');
+            this.stompClient = Stomp.over(socket);
+            this.stompClient.connect('guest', 'guest',
+                    _.bind(this.onConnected, this));
+        },
+        disconnect: function () {
+            this.stompClient.disconnect();
+            this.setButtonState(false);
+        },
+        like: function () {
+            this.stompClient.send("/app/like",
+                    {/*headers*/},
+                    JSON.stringify({/*body*/}));
+        },
+        onConnected: function (frame) {
+            this.setButtonState(true);
+            this.stompClient.subscribe('/topic/like',
+                    _.bind(this.onSubscribe, this));
+        },
+        onSubscribe: function (response) {
+            this.model = new Backbone.Model(JSON.parse(response.body));
+            this.render();
+        },
+        render: function () {
+            if (this.model) {
+                this.$result.text(this.model.get('total') + ' @'
+                        + new Date(this.model.get('lastModifiedAt')));
+            }
+            return this;
+        },
+        setButtonState: function (connected) {
+            this.$connect.attr('disabled', connected);
+            this.$disconnect.attr('disabled', !connected);
+            this.$like.attr('disabled', !connected);
+        }
+    });
+
+    $(function () {
+        new AppView();
+    });
+</script>
+</body>
+</html>
