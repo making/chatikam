@@ -1,6 +1,11 @@
-spring.thymeleaf.cache: false
-security.basic.enabled: false
-security.user.name: demo
-security.user.password: demo
+spring:
+  thymeleaf.cache: false
+  jpa:
+    show-sql: false
+    hibernate.ddl-auto: validate
+security:
+  basic.enabled: false
+  user:
+    name: demo
+    password: demo
 shell.auth: spring
-spring.jpa.show-sql: false

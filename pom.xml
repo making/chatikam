@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.0.1.RELEASE</version>
+        <version>1.1.1.RELEASE</version>
     </parent>
     <dependencies>
         <dependency>
@@ -27,10 +27,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-shell-remote</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
@@ -49,11 +45,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>javax.transaction-api</artifactId>
@@ -76,45 +75,87 @@
             <artifactId>log4jdbc-remix</artifactId>
             <version>0.2.7</version>
         </dependency>
-		<!-- Provided (for embedded war support) -->
-         <!--<dependency>-->
-                 <!--<groupId>org.springframework.boot</groupId>-->
-                 <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-                 <!--<scope>provided</scope>-->
-         <!--</dependency>-->
-         <!--<dependency>-->
-                 <!--<groupId>org.apache.tomcat.embed</groupId>-->
-                 <!--<artifactId>tomcat-embed-jasper</artifactId>-->
-                 <!--<scope>provided</scope>-->
-         <!--</dependency>-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.1.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-tools</artifactId>
+            <version>4.3.1.CR1</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>springloaded</artifactId>
+                        <version>1.2.0.RELEASE</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>http://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>http://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+
+    <profiles>
+        <profile>
+            <id>gen-ddl</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <!-- Hibernatetool will generate everything before running tests -->
+                                <phase>test-compile</phase>
+                                <configuration>
+                                    <target>
+                                        <echo message="[gen-ddl] start!"/>
+                                        <property name="maven_compile_classpath" refid="maven.compile.classpath"/>
+                                        <property name="maven_test_classpath" refid="maven.test.classpath"/>
+                                        <path id="hibernatetool.path">
+                                            <pathelement path="${maven_compile_classpath}"/>
+                                            <pathelement path="${maven_test_classpath}"/>
+                                        </path>
+                                        <taskdef name="hibernatetool"
+                                                 classname="org.hibernate.tool.ant.HibernateToolTask"
+                                                 classpathref="hibernatetool.path"/>
+                                        <property name="ddl.generated.directory"
+                                                  value="${project.build.directory}/generated-ddl"/>
+                                        <mkdir dir="${ddl.generated.directory}"/>
+                                        <hibernatetool destdir="${ddl.generated.directory}">
+                                            <classpath>
+                                                <path location="${project.build.directory}/classes"/>
+                                            </classpath>
+                                            <jpaconfiguration persistenceunit="gen-ddl"/>
+                                            <hbm2ddl export="false" outputfilename="generated-ddl.sql" format="true"/>
+                                        </hibernatetool>
+                                        <echo message="[gen-ddl] completed!"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
