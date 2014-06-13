@@ -1,0 +1,1 @@
+INSERT INTO chat_channel(chat_channel_name) VALUES ('Hoge');
