@@ -1,1 +1,1 @@
-INSERT INTO chat_channel(chat_channel_name) VALUES ('Hoge');
+INSERT INTO chat_channel (chat_channel_name, chat_channel_hashed_password, visible) VALUES ('demo', NULL, TRUE);

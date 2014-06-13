@@ -1,8 +1,10 @@
 spring:
+  main.show-banner: false
   thymeleaf.cache: false
   jpa:
     show-sql: false
     hibernate.ddl-auto: validate
+  jmx.enabled: false
 security:
   basic.enabled: false
   user:
