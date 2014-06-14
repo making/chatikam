@@ -1,35 +1,32 @@
 package chatikam.api.channel;
 
-import java.util.List;
+import chatikam.domain.model.ChannelName;
+import chatikam.domain.model.Participants;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import chatikam.domain.model.ChatChannel;
-import chatikam.domain.service.channel.ChatChannelService;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("api/channels")
 public class ChannelRestController {
     @Inject
-    ChatChannelService chatChannelService;
-    
+    Participants participants;
+
     @RequestMapping(method = RequestMethod.GET)
-    List<ChatChannel> getChannels() {
-        return chatChannelService.findAllVisibleChannel();
+    Collection<ChannelName> getChannels() {
+        return participants.availableChannels();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    ChatChannel postChannels(@RequestBody ChatChannel chatChannel) {
-        return chatChannelService.createNewChannel(chatChannel.getChatChannelName(), chatChannel.isVisible());
-    }
-    
-    @RequestMapping(value = "{channelName}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteChannels(@PathVariable("channelName") String channelName) {
-       chatChannelService.deleteChannel(channelName);
+    @RequestMapping(value = "{channelName}", method = RequestMethod.GET)
+    ResponseEntity<ChannelName> getChannel(@PathVariable("channelName") String channelName) {
+        return participants.getChannel(channelName)
+                .map(channel -> new ResponseEntity<>(channel, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CHAT.IK.AM</title>
+    <script src="vendor/sockjs/sockjs.js"></script>
+    <script src="vendor/stomp-websocket/lib/stomp.js"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+            document.getElementById('nicknames').innerHTML = '';
+            document.getElementById('nickname').disabled = connected;
+            document.getElementById('channel').disabled = connected;
+        }
+
+        function connect() {
+            var nickname = encodeURIComponent(document.getElementById('nickname').value);
+            var channel = encodeURIComponent(document.getElementById('channel').value);
+
+            if (!(nickname && channel)) {
+                alert('enter nickname and channel!');
+                return;
+            }
+            var socket = new SockJS('/chat');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                setConnected(true);
+                stompClient.subscribe('/topic/message/' + channel, function (greeting) {
+                    var message = JSON.parse(greeting.body);
+                    showGreeting('[' + message.nickname.value + '] ' + message.message);
+                });
+                var nicknames = {};
+                stompClient.subscribe('/app/join/' + channel + '/' + nickname, function (participants) {
+                    JSON.parse(participants.body).forEach(function (partiticant) {
+                        nicknames[decodeURIComponent(partiticant.value)] = true;
+                    });
+                    showNicknames(nicknames);
+                });
+                stompClient.subscribe('/topic/join/' + channel, function (nickname) {
+                    nicknames[decodeURIComponent(JSON.parse(nickname.body).value)] = true;
+                    showNicknames(nicknames);
+                });
+                stompClient.subscribe('/topic/leave/' + channel, function (nickname) {
+                    delete nicknames[decodeURIComponent(JSON.parse(nickname.body).value)];
+                    showNicknames(nicknames);
+                });
+            });
+        }
+
+        function disconnect() {
+            stompClient.disconnect();
+            setConnected(false);
+        }
+
+        function sendMessage() {
+            var message = encodeURIComponent(document.getElementById('message').value);
+            var channel = encodeURIComponent(document.getElementById('channel').value);
+            stompClient.send("/app/message/" + channel, {}, JSON.stringify({ 'message': message }));
+        }
+
+        function showGreeting(message) {
+            var response = document.getElementById('response');
+            var p = document.createElement('p');
+            p.style.wordWrap = 'break-word';
+            p.style.margin = '0px';
+            p.style.padding = '0px';
+            p.appendChild(document.createTextNode(decodeURIComponent(message)));
+            response.appendChild(p);
+        }
+        function showNicknames(nicknames) {
+            var response = document.getElementById('nicknames');
+            response.innerHTML = '';
+            for (var nickname in nicknames) {
+                var p = document.createElement('p');
+                p.style.wordWrap = 'break-word';
+                p.style.margin = '0px';
+                p.style.padding = '0px';
+                p.appendChild(document.createTextNode(decodeURIComponent(nickname)));
+                response.appendChild(p);
+            }
+        }
+    </script>
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div>
+    <div>
+        <input type="text" id="nickname" placeholder="nickname" required=""/>
+        <input type="text" id="channel" placeholder="channel" required=""/>
+        <button id="connect" onclick="connect();">Connect</button>
+        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+    </div>
+    <div id="conversationDiv" style="visibility: hidden">
+        <label>Message: </label><input type="text" id="message"/>
+        <button id="sendName" onclick="sendMessage();">Send</button>
+        <p id="response" style="border: #000000 solid 1px; padding: 5px"></p>
+
+        <p id="nicknames" style="border: #000000 solid 1px; padding: 5px"></p>
+    </div>
+</div>
+</body>
+</html>

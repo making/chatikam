@@ -6,4 +6,5 @@
     <logger name="jdbc" level="OFF"/>
     <logger name="jdbc.sqltiming" level="DEBUG"/>
     <logger name="jdbc.resultsettable" level="ERROR"/>
+    <logger name="org.springframework.messaging" level="DEBUG"/>
 </configuration>

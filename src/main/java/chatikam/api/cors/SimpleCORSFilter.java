@@ -1,4 +1,4 @@
-package chatikam.cors;
+package chatikam.api.cors;
 
 import javax.inject.Named;
 import java.io.IOException;
