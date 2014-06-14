@@ -6,6 +6,11 @@
     <script src="vendor/stomp-websocket/lib/stomp.js"></script>
     <script type="text/javascript">
         var stompClient = null;
+        var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+        if (Notification) {
+            Notification.requestPermission(function (permission) {
+            });
+        }
 
         function setConnected(connected) {
             document.getElementById('connect').disabled = connected;
@@ -31,7 +36,18 @@
                 setConnected(true);
                 stompClient.subscribe('/topic/message/' + channel, function (greeting) {
                     var message = JSON.parse(greeting.body);
-                    showGreeting('[' + message.nickname.value + '] ' + message.message);
+                    showGreeting('[' + decodeURIComponent(message.nickname.value) + '] ' + decodeURIComponent(message.message));
+                    if (Notification) {
+                        var from = message.nickname.value;
+                        if (from != nickname) {
+                            var title = decodeURIComponent(from) + ' @ ' + channel;
+                            new Notification(
+                                    title, {
+                                        body: decodeURIComponent(message.message)
+                                    }
+                            );
+                        }
+                    }
                 });
                 var nicknames = {};
                 stompClient.subscribe('/app/join/' + channel + '/' + nickname, function (participants) {
