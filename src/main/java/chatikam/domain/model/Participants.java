@@ -8,6 +8,7 @@ import javax.inject.Named;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 @Named
 @ToString
@@ -34,19 +35,20 @@ public class Participants {
         return this;
     }
 
-    public Set<ChannelName> joinedChannels(SessionId sessionId) {
+    public Collection<ChannelName> joinedChannels(SessionId sessionId) {
         Set<ChannelName> joinedChannels = table.row(sessionId).keySet();
         return joinedChannels;
     }
 
-    public Set<ChannelName> availableChannels() {
-        Set<ChannelName> channelNames = table.columnKeySet();
-        return channelNames;
+    public Collection<ChannelName> getPublicChannels() {
+        return table.columnKeySet().stream()
+                .filter(ChannelName::isPublic)
+                .collect(Collectors.toList());
     }
 
-    public Optional<ChannelName> getChannel(String channelName) {
+    public Optional<ChannelName> getChannel(ChannelName channelName) {
         if (table.containsColumn(channelName)) {
-            return Optional.of(ChannelName.of(channelName));
+            return Optional.of(channelName);
         }
         return Optional.empty();
     }

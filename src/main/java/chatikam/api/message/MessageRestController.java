@@ -17,11 +17,11 @@ public class MessageRestController {
     MessageService messageService;
 
     @RequestMapping("{channelName}/{nickname}")
-    public void sendInstantMessage(@PathVariable("channelName") String channelName,
+    public void sendInstantMessage(@PathVariable("channelName") ChannelName channelName,
                                    @PathVariable("nickname") String nickname,
                                    @RequestParam("message") String message) {
         messageService.sendInstantMessage(
-                ChannelName.of(channelName),
+                channelName,
                 Nickname.of('$' + nickname + '$'),
                 message);
     }

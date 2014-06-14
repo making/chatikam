@@ -23,8 +23,8 @@
         }
 
         function connect() {
-            var nickname = encodeURIComponent(document.getElementById('nickname').value);
-            var channel = encodeURIComponent(document.getElementById('channel').value);
+            var nickname = document.getElementById('nickname').value;
+            var channel = document.getElementById('channel').value;
 
             if (!(nickname && channel)) {
                 alert('enter nickname and channel!');
@@ -34,34 +34,36 @@
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 setConnected(true);
-                stompClient.subscribe('/topic/message/' + channel, function (greeting) {
-                    var message = JSON.parse(greeting.body);
-                    showGreeting('[' + decodeURIComponent(message.nickname.value) + '] ' + decodeURIComponent(message.message));
-                    if (Notification) {
-                        var from = message.nickname.value;
-                        if (from != nickname) {
-                            var title = decodeURIComponent(from) + ' @ ' + channel;
-                            new Notification(
-                                    title, {
-                                        body: decodeURIComponent(message.message)
-                                    }
-                            );
-                        }
-                    }
-                });
+                stompClient.subscribe('/topic/message/' + encodeURIComponent(channel),
+                        function (greeting) {
+                            var message = JSON.parse(greeting.body);
+                            showGreeting('[' + message.nickname.value + '] ' + message.message);
+                            if (Notification) {
+                                var from = message.nickname.value;
+                                if (from != nickname) {
+                                    var title = from + ' @ ' + message.channelName.value;
+                                    new Notification(
+                                            title, {
+                                                body: message.message
+                                            }
+                                    );
+                                }
+                            }
+                        });
                 var nicknames = {};
-                stompClient.subscribe('/app/join/' + channel + '/' + nickname, function (participants) {
-                    JSON.parse(participants.body).forEach(function (partiticant) {
-                        nicknames[decodeURIComponent(partiticant.value)] = true;
-                    });
+                stompClient.subscribe('/app/join/' + encodeURIComponent(channel) + '/' + encodeURIComponent(nickname),
+                        function (participants) {
+                            JSON.parse(participants.body).forEach(function (partiticant) {
+                                nicknames[partiticant.value] = true;
+                            });
+                            showNicknames(nicknames);
+                        });
+                stompClient.subscribe('/topic/join/' + encodeURIComponent(channel), function (nickname) {
+                    nicknames[JSON.parse(nickname.body).value] = true;
                     showNicknames(nicknames);
                 });
-                stompClient.subscribe('/topic/join/' + channel, function (nickname) {
-                    nicknames[decodeURIComponent(JSON.parse(nickname.body).value)] = true;
-                    showNicknames(nicknames);
-                });
-                stompClient.subscribe('/topic/leave/' + channel, function (nickname) {
-                    delete nicknames[decodeURIComponent(JSON.parse(nickname.body).value)];
+                stompClient.subscribe('/topic/leave/' + encodeURIComponent(channel), function (nickname) {
+                    delete nicknames[JSON.parse(nickname.body).value];
                     showNicknames(nicknames);
                 });
             });
@@ -73,9 +75,10 @@
         }
 
         function sendMessage() {
-            var message = encodeURIComponent(document.getElementById('message').value);
-            var channel = encodeURIComponent(document.getElementById('channel').value);
-            stompClient.send("/app/message/" + channel, {}, JSON.stringify({ 'message': message }));
+            var message = document.getElementById('message').value;
+            var channel = document.getElementById('channel').value;
+            stompClient.send("/app/message/" + encodeURIComponent(channel), {},
+                    JSON.stringify({ 'message': encodeURIComponent(message) }));
         }
 
         function showGreeting(message) {
@@ -84,7 +87,7 @@
             p.style.wordWrap = 'break-word';
             p.style.margin = '0px';
             p.style.padding = '0px';
-            p.appendChild(document.createTextNode(decodeURIComponent(message)));
+            p.appendChild(document.createTextNode(message));
             response.appendChild(p);
         }
         function showNicknames(nicknames) {
@@ -95,7 +98,7 @@
                 p.style.wordWrap = 'break-word';
                 p.style.margin = '0px';
                 p.style.padding = '0px';
-                p.appendChild(document.createTextNode(decodeURIComponent(nickname)));
+                p.appendChild(document.createTextNode(nickname));
                 response.appendChild(p);
             }
         }

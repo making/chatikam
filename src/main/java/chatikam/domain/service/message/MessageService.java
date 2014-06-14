@@ -16,24 +16,27 @@ public class MessageService {
     public void sendJoiningMessage(ChannelName channelName, Nickname nickname) {
         ChatTextOutboundMessage message = new ChatTextOutboundMessage(
                 String.format("'%s' joined!", nickname.getValue()),
+                channelName,
                 Nickname.SYSTEM
         );
-        simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.getValue(), message);
-        simpMessagingTemplate.convertAndSend("/topic/join/" + channelName.getValue(), nickname);
+        simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.urlEncode(), message);
+        simpMessagingTemplate.convertAndSend("/topic/join/" + channelName.urlEncode(), nickname);
     }
 
     public void sendLeavingMessage(ChannelName channelName, Nickname nickname) {
         ChatTextOutboundMessage message = new ChatTextOutboundMessage(
                 String.format("'%s' left...", nickname.getValue()),
+                channelName,
                 Nickname.SYSTEM
         );
-        simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.getValue(), message);
-        simpMessagingTemplate.convertAndSend("/topic/leave/" + channelName.getValue(), nickname);
+        simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.urlEncode(), message);
+        simpMessagingTemplate.convertAndSend("/topic/leave/" + channelName.urlEncode(), nickname);
     }
 
     public void sendInstantMessage(ChannelName channelName, Nickname nickname, String message) {
-        simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.getValue(), new ChatTextOutboundMessage(
+        simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.urlEncode(), new ChatTextOutboundMessage(
                 message,
+                channelName,
                 nickname
         ));
     }

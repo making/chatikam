@@ -7,5 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChatTextOutboundMessage {
     private final String message;
+    private final ChannelName channelName;
     private final Nickname nickname;
 }

@@ -20,11 +20,11 @@ public class ChannelRestController {
 
     @RequestMapping(method = RequestMethod.GET)
     Collection<ChannelName> getChannels() {
-        return participants.availableChannels();
+        return participants.getPublicChannels();
     }
 
     @RequestMapping(value = "{channelName}", method = RequestMethod.GET)
-    ResponseEntity<ChannelName> getChannel(@PathVariable("channelName") String channelName) {
+    ResponseEntity<ChannelName> getChannel(@PathVariable("channelName") ChannelName channelName) {
         return participants.getChannel(channelName)
                 .map(channel -> new ResponseEntity<>(channel, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));

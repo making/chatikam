@@ -1,28 +1,26 @@
 package chatikam.config;
 
+import chatikam.infra.conveter.StringToChannelNameConverter;
+import chatikam.infra.conveter.StringToNickameConverter;
+import chatikam.infra.conveter.StringToSessionIdConverter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-//    @Autowired
-//    private DataSourceProperties properties;
-//
-//    private DataSource dataSource;
-//
-//    @ConfigurationProperties(prefix = DataSourceAutoConfiguration.CONFIGURATION_PREFIX)
-//    @Bean
-//    DataSource realDataSource() {
-//        DataSourceBuilder factory = DataSourceBuilder
-//                .create(this.properties.getClassLoader())
-//                .url(this.properties.getUrl())
-//                .username(this.properties.getUsername())
-//                .password(this.properties.getPassword());
-//        this.dataSource =  factory.build();
-//        return  this.dataSource;
-//    }
-//
-//    @Bean
-//    DataSource dataSource() {
-//        return new Log4jdbcProxyDataSource(this.dataSource);
-//    }
+
+    @Bean
+    StringToNickameConverter stringToNickameConverter() {
+        return new StringToNickameConverter();
+    }
+
+    @Bean
+    StringToChannelNameConverter stringToChannelNameConverter() {
+        return new StringToChannelNameConverter();
+    }
+
+    @Bean
+    StringToSessionIdConverter stringToSessionIdConverter() {
+        return new StringToSessionIdConverter();
+    }
 }
