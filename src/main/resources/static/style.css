@@ -1,0 +1,42 @@
+
+html {
+    font-family: tahoma;
+}
+
+#chat-table {
+    width: 100%;
+}
+
+#chat-table #recipient {
+    width: 8em;
+    border: 1px solid #777;
+}
+
+#chat-table #chat {
+    border: 1px solid #777;
+}
+
+.chat-window {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+#chat-table td {
+    width: auto;
+    vertical-align: top;
+}
+
+#chat-table td#input-cell {
+    height: 2em;
+}
+
+input {
+    border: 1px solid #333;
+    background-color: #eee;
+    font-size: 1.4em;
+}
+
+button {
+    font-size: 1.4em;
+}
+

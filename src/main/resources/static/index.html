@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>CHAT.IK.AM</title>
+
+    <link href="style.css" rel="stylesheet">
     <script src="vendor/sockjs/sockjs.js"></script>
     <script src="vendor/stomp-websocket/lib/stomp.js"></script>
     <script type="text/javascript">
@@ -115,12 +117,27 @@
         <button id="connect" onclick="connect();">Connect</button>
         <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
     </div>
-    <div id="conversationDiv" style="visibility: hidden">
-        <label>Message: </label><input type="text" id="message"/>
-        <button id="sendName" onclick="sendMessage();">Send</button>
-        <p id="response" style="border: #000000 solid 1px; padding: 5px"></p>
-
-        <p id="nicknames" style="border: #000000 solid 1px; padding: 5px"></p>
+    <div id="chat-panel">
+        <table id="chat-table">
+            <tr>
+                <td id="recipient">
+                    <p id="nicknames"></p>
+                </td>
+                <td id="chat">
+                    <div id="#chat-windows">
+                        <div class="chat-window">
+                            <p id="response"></p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr id="conversationDiv" style="visibility: hidden">
+                <td id="input-cell" colspan="2">
+                    <label>Message: </label><input type="text" id="message" size="80"/>
+                    <button id="sendName" onclick="sendMessage();">Send</button>
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 </body>
