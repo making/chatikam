@@ -36,9 +36,9 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.3.3" level="project" />
-    <orderEntry type="library" name="Maven: org.hibernate:hibernate-validator:5.1.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate:hibernate-validator:5.0.3.Final" level="project" />
     <orderEntry type="library" name="Maven: javax.validation:validation-api:1.1.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging:3.1.3.GA" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging:3.1.1.GA" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-web:4.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:4.0.5.RELEASE" level="project" />
@@ -46,51 +46,16 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-websocket:4.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:7.0.54" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:1.1.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: junit:junit:4.11" level="project" />
-    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.11" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-core:1.9.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-library:1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.0.5.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.thymeleaf:thymeleaf-spring4:2.1.3.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.thymeleaf:thymeleaf:2.1.3.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: ognl:ognl:3.0.6" level="project" />
-    <orderEntry type="library" name="Maven: org.javassist:javassist:3.18.1-GA" level="project" />
-    <orderEntry type="library" name="Maven: org.unbescape:unbescape:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-messaging:4.0.5.RELEASE" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.h2database:h2:1.3.175" level="project" />
-    <orderEntry type="library" name="Maven: javax.transaction:javax.transaction-api:1.2" level="project" />
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:17.0" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.12.2" level="project" />
-    <orderEntry type="library" name="Maven: org.lazyluke:log4jdbc-remix:0.2.7" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hibernate:hibernate-tools:4.3.1.CR1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hibernate:hibernate-core:4.3.1.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.jboss.logging:jboss-logging-annotations:1.2.0.Beta1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: dom4j:dom4j:1.6.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: xml-apis:xml-apis:1.0.b2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hibernate.common:hibernate-commons-annotations:4.0.4.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: antlr:antlr:2.7.7" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.jboss:jandex:1.1.0.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hibernate:hibernate-entitymanager:4.3.1.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: javax.transaction:jta:1.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: ant:ant:1.6.5" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: freemarker:freemarker:2.3.8" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hibernate:jtidy:r8-20060801" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.tycho:org.eclipse.jdt.core:3.9.1.v20130905-0837" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse:text:3.3.0-v20070606-0010" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.core:commands:3.3.0-I20070605-0010" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.equinox:common:3.6.200-v20130402-1505" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.core:runtime:3.9.0-v20130326-1255" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse:osgi:3.9.1-v20140110-1610" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.core:jobs:3.5.300-v20130429-1813" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.equinox:registry:3.5.301-v20130717-1549" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.equinox:preferences:3.5.100-v20130422-1538" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.core:contenttype:3.4.200-v20130326-1255" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.equinox:app:1.3.100-v20130327-1442" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
   </component>
 </module>
 
