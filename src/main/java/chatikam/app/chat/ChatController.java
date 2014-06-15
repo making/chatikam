@@ -2,6 +2,8 @@ package chatikam.app.chat;
 
 import chatikam.domain.model.*;
 import chatikam.domain.service.message.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,10 +22,13 @@ public class ChatController {
     @Inject
     MessageService messageService;
 
+    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
+
     @SubscribeMapping("/join/{channelName}/{nickname}")
     public Collection<Nickname> join(@Header("simpSessionId") SessionId simpSessionId,
                                      @DestinationVariable("channelName") ChannelName channelName,
                                      @DestinationVariable("nickname") Nickname nickname) {
+        logger.info("channelName:{}\tnickname:{}", channelName, nickname);
         participants.join(simpSessionId, channelName, nickname);
         messageService.sendJoiningMessage(channelName, nickname);
         return participants.joinedNicknames(channelName);

@@ -95,7 +95,6 @@
                         });
                 $scope.stompClient.subscribe('/app/join/' + encodeURIComponent(channel) + '/' + encodeURIComponent(nickname),
                         function (participants) {
-                            console.log(participants);
                             JSON.parse(participants.body).forEach(function (partiticant) {
                                 $scope.nicknames[partiticant.value] = true;
                             });
