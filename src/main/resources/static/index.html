@@ -3,51 +3,84 @@
 <head>
     <title>CHAT.IK.AM</title>
 
-    <!--<link href="vendor/uikit/dist/css/uikit.min.css" rel="stylesheet">-->
-    <link href="style.css" rel="stylesheet">
+    <link href="vendor/uikit/dist/css/uikit.gradient.min.css" rel="stylesheet">
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/uikit/dist/js/uikit.min.js"></script>
+    <!-- Codemirror and marked dependencies -->
+    <link href="vendor/uikit/dist/css/addons/uikit.gradient.addons.min.css" rel="stylesheet">
+    <link href="vendor/codemirror/lib/codemirror.css" rel="stylesheet">
+    <script src="vendor/codemirror/lib/codemirror.js"></script>
+    <script src="vendor/codemirror/mode/markdown/markdown.js"></script>
+    <script src="vendor/codemirror/addon/mode/overlay.js"></script>
+    <script src="vendor/codemirror/mode/xml/xml.js"></script>
+    <script src="vendor/codemirror/mode/gfm/gfm.js"></script>
+    <script src="vendor/marked/lib/marked.js"></script>
+    <!-- HTML editor JavaScript -->
+    <script src="vendor/uikit/dist/js/addons/htmleditor.js"></script>
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
-<div ng-app="" ng-controller="ChatController">
-    <div>
-        <input ng-model="ctrl.nickname" ng-disabled="ctrl.connected" type="text" id="nickname" placeholder="nickname"
-               required=""/>
-        <input ng-model="ctrl.channel" ng-disabled="ctrl.connected" type="text" id="channel" placeholder="channel"
-               required=""/>
-        <button id="connect" ng-click="connect()" ng-disabled="ctrl.connected">Connect</button>
-        <button id="disconnect" ng-disabled="!ctrl.connected" ng-click="disconnect()">Disconnect</button>
-        <label><input type="checkbox" ng-model="ctrl.notify"/>Notify</label>
-    </div>
-    <div id="chat-panel">
-        <table id="chat-table">
-            <tr>
-                <td id="recipient">
-                    <ul>
-                        <li ng-repeat="(nickname, v) in nicknames">{{nickname}}</li>
-                    </ul>
-                </td>
-                <td id="chat">
-                    <div id="#chat-windows">
-                        <div class="chat-window">
-                            <p ng-repeat='message in messages'><strong>{{message.nickname.value}}</strong> &gt; <span>{{message.message}}</span>
-                            </p>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr id="conversationDiv">
-                <td id="input-cell" colspan="2">
-                    <label>Message: </label><input ng-model="text" ng-disabled="!ctrl.connected" type="text"
-                                                   id="message" size="80"/>
-                    <button id="sendName" ng-click="sendMessage()" ng-disabled="!ctrl.connected">Send</button>
-                </td>
-            </tr>
-        </table>
+<div ng-app="" ng-controller="ChatController"
+     class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+    <div class="uk-grid" data-uk-grid-match>
+        <div class="uk-width-1-1">
+            <form class="uk-form">
+                <div class="uk-form-controls">
+                    <input ng-model="ctrl.nickname" ng-disabled="ctrl.connected"
+                           type="text" placeholder="nickname"
+                           required=""/>
+                    <input ng-model="ctrl.channel" ng-disabled="ctrl.connected"
+                           type="text" placeholder="channel"
+                           required=""/>
+                    <button ng-click="connect()" ng-disabled="ctrl.connected"
+                            class="uk-button uk-button-primary">Connect
+                    </button>
+                    <button ng-disabled="!ctrl.connected" ng-click="disconnect()"
+                            class="uk-button uk-button-danger">Disconnect
+                    </button>
+                    <label><input type="checkbox" ng-model="ctrl.notify"/>Notify</label>
+                </div>
+            </form>
+        </div>
+        <div class="uk-width-1-1" style="height: 10px;"></div>
+        <div class="uk-width-2-10">
+            <h3>Participants</h3>
+
+            <div class="uk-panel uk-panel-box" style="height: 300px; overflow-y: scroll;">
+                <ul class="uk-list uk-list-line">
+                    <li ng-repeat="(nickname, v) in nicknames">{{nickname}}</li>
+                </ul>
+            </div>
+        </div>
+        <div id="conversation" class="uk-width-8-10" style="height: 400px; overflow-y: scroll;">
+            <h3>Conversation</h3>
+
+            <div class="uk-panel uk-panel-box" ng-repeat="message in messages" style="margin-top: 5px;">
+                <h3 class="uk-panel-title"><i class="uk-icon-user"></i> {{message.nickname.value}}</h3>
+
+                <p ng-switch="message.type">
+                    <span ng-switch-when="TXT">{{message.message}}</span>
+                    <span ng-switch-when="MD" ng-bind-html="message.message"></span>
+                </p>
+                <br>
+                <small>{{message.date}}</small>
+            </div>
+        </div>
+        <div class="uk-width-1-1" style="height: 10px;"></div>
+        <div class="uk-width-1-1">
+            <form class="uk-form">
+                <textarea ng-model="text" ng-disabled="!ctrl.connected"
+                          data-uk-htmleditor="{mode:'tab', markdown:true, height:100}"></textarea>
+                <button ng-click="sendMessage()" ng-disabled="!ctrl.connected"
+                        class="uk-button uk-button-large">Send
+                </button>
+            </form>
+        </div>
     </div>
 </div>
+
+
 <script src="vendor/angular/angular.min.js"></script>
+
 <script src="vendor/sockjs/sockjs.js"></script>
 <script src="vendor/stomp-websocket/lib/stomp.js"></script>
 <script type="text/javascript">
@@ -56,7 +89,10 @@
         Notification.requestPermission(function (permission) {
         });
     }
-    function ChatController($scope) {
+    marked.setOptions({
+        sanitize: true
+    });
+    function ChatController($scope, $sce) {
         $scope.ctrl = {
             connected: false,
             nickname: '',
@@ -83,6 +119,14 @@
                 $scope.stompClient.subscribe('/topic/message/' + encodeURIComponent(channel),
                         function (res) {
                             var message = JSON.parse(res.body);
+                            if (message.type === 'MD') {
+                                message.message = $sce.trustAsHtml(marked(message.message));
+                                message.trust = true;
+                            } else {
+                                message.message = message.message;
+                                message.trust = false;
+                            }
+                            message.date = new Date(message.timestamp).toString();
                             $scope.messages.push(message);
                             if ($scope.ctrl.notify && Notification) {
                                 var from = message.nickname.value;
@@ -91,6 +135,7 @@
                                     new Notification(title, {body: message.message});
                                 }
                             }
+                            $("#conversation").animate({ scrollTop: $(document).height() * $scope.messages.length }, 100);
                             $scope.$apply();
                         });
                 $scope.stompClient.subscribe('/app/join/' + encodeURIComponent(channel) + '/' + encodeURIComponent(nickname),
@@ -121,11 +166,17 @@
         };
 
         $scope.sendMessage = function () {
-            var message = $scope.text;
+            if (!$scope.codemirror) {
+                $scope.codemirror = $('.CodeMirror')[0].CodeMirror;
+            }
+            var message = $scope.codemirror.getValue();
             var channel = $scope.ctrl.channel;
             $scope.stompClient.send("/app/message/" + encodeURIComponent(channel), {},
-                    JSON.stringify({ 'message': encodeURIComponent(message) }));
-            $scope.text = '';
+                    JSON.stringify({
+                        'message': encodeURIComponent(message),
+                        'type': 'MD'
+                    }));
+            $scope.codemirror.setValue('');
         }
 
         $scope.debug = function () {

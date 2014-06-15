@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 
 @Controller
@@ -42,7 +43,10 @@ public class ChatController {
         return new ChatTextOutboundMessage(
                 inboundMessage.getMessage(),
                 channelName,
-                nickname.orElse(Nickname.SYSTEM));
+                nickname.orElse(Nickname.SYSTEM),
+                inboundMessage.getType(),
+                new Date().getTime()
+        );
     }
 
 }

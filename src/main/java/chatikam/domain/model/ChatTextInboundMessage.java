@@ -14,6 +14,8 @@ public class ChatTextInboundMessage {
     @JsonDeserialize(using = MessageDeserializer.class)
     private String message;
 
+    private MessageType type;
+
     public static class MessageDeserializer extends StdScalarDeserializer<String> {
 
         public MessageDeserializer() {

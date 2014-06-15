@@ -2,11 +2,13 @@ package chatikam.domain.service.message;
 
 import chatikam.domain.model.ChannelName;
 import chatikam.domain.model.ChatTextOutboundMessage;
+import chatikam.domain.model.MessageType;
 import chatikam.domain.model.Nickname;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Date;
 
 @Named
 public class MessageService {
@@ -17,7 +19,9 @@ public class MessageService {
         ChatTextOutboundMessage message = new ChatTextOutboundMessage(
                 String.format("'%s' joined!", nickname.getValue()),
                 channelName,
-                Nickname.SYSTEM
+                Nickname.SYSTEM,
+                MessageType.TXT,
+                new Date().getTime()
         );
         simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.urlEncode(), message);
         simpMessagingTemplate.convertAndSend("/topic/join/" + channelName.urlEncode(), nickname);
@@ -27,7 +31,9 @@ public class MessageService {
         ChatTextOutboundMessage message = new ChatTextOutboundMessage(
                 String.format("'%s' left...", nickname.getValue()),
                 channelName,
-                Nickname.SYSTEM
+                Nickname.SYSTEM,
+                MessageType.TXT,
+                new Date().getTime()
         );
         simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.urlEncode(), message);
         simpMessagingTemplate.convertAndSend("/topic/leave/" + channelName.urlEncode(), nickname);
@@ -37,7 +43,9 @@ public class MessageService {
         simpMessagingTemplate.convertAndSend("/topic/message/" + channelName.urlEncode(), new ChatTextOutboundMessage(
                 message,
                 channelName,
-                nickname
+                nickname,
+                MessageType.TXT,
+                new Date().getTime()
         ));
     }
 }

@@ -26,7 +26,7 @@
             autocomplete : true,
             height       : 500,
             maxsplitsize : 1000,
-            markedOptions: { gfm: true, tables: true, breaks: true, pedantic: true, sanitize: false, smartLists: true, smartypants: false, langPrefix: 'lang-'},
+            markedOptions: { gfm: true, tables: true, breaks: true, pedantic: true, sanitize: true, smartLists: true, smartypants: false, langPrefix: 'lang-'},
             codemirror   : { mode: 'htmlmixed', tabMode: 'indent', tabsize: 4, lineWrapping: true, dragDrop: false, autoCloseTags: true, matchTags: true, autoCloseBrackets: true, matchBrackets: true, indentUnit: 4, hintOptions: {completionSingle:false} },
             toolbar      : [ 'bold', 'italic', 'strike', 'link', 'image', 'blockquote', 'listUl', 'listOl' ],
             lblPreview   : 'Preview',

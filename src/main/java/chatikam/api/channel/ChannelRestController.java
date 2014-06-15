@@ -18,7 +18,7 @@ public class ChannelRestController {
     @Inject
     Participants participants;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping
     Collection<ChannelName> getChannels() {
         return participants.getPublicChannels();
     }
