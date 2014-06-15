@@ -3,142 +3,136 @@
 <head>
     <title>CHAT.IK.AM</title>
 
+    <!--<link href="vendor/uikit/dist/css/uikit.min.css" rel="stylesheet">-->
     <link href="style.css" rel="stylesheet">
-    <script src="vendor/sockjs/sockjs.js"></script>
-    <script src="vendor/stomp-websocket/lib/stomp.js"></script>
-    <script type="text/javascript">
-        var stompClient = null;
-        var Notification = window.Notification || window.mozNotification || window.webkitNotification;
-        if (Notification) {
-            Notification.requestPermission(function (permission) {
-            });
-        }
-
-        function setConnected(connected) {
-            document.getElementById('connect').disabled = connected;
-            document.getElementById('disconnect').disabled = !connected;
-            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
-            document.getElementById('response').innerHTML = '';
-            document.getElementById('nicknames').innerHTML = '';
-            document.getElementById('nickname').disabled = connected;
-            document.getElementById('channel').disabled = connected;
-        }
-
-        function connect() {
-            var nickname = document.getElementById('nickname').value;
-            var channel = document.getElementById('channel').value;
-
-            if (!(nickname && channel)) {
-                alert('enter nickname and channel!');
-                return;
-            }
-            var socket = new SockJS('/chat');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                setConnected(true);
-                stompClient.subscribe('/topic/message/' + encodeURIComponent(channel),
-                        function (greeting) {
-                            var message = JSON.parse(greeting.body);
-                            showGreeting('[' + message.nickname.value + '] ' + message.message);
-                            if (Notification) {
-                                var from = message.nickname.value;
-                                if (from != nickname) {
-                                    var title = from + ' @ ' + message.channelName.value;
-                                    new Notification(
-                                            title, {
-                                                body: message.message
-                                            }
-                                    );
-                                }
-                            }
-                        });
-                var nicknames = {};
-                stompClient.subscribe('/app/join/' + encodeURIComponent(channel) + '/' + encodeURIComponent(nickname),
-                        function (participants) {
-                            JSON.parse(participants.body).forEach(function (partiticant) {
-                                nicknames[partiticant.value] = true;
-                            });
-                            showNicknames(nicknames);
-                        });
-                stompClient.subscribe('/topic/join/' + encodeURIComponent(channel), function (nickname) {
-                    nicknames[JSON.parse(nickname.body).value] = true;
-                    showNicknames(nicknames);
-                });
-                stompClient.subscribe('/topic/leave/' + encodeURIComponent(channel), function (nickname) {
-                    delete nicknames[JSON.parse(nickname.body).value];
-                    showNicknames(nicknames);
-                });
-            });
-        }
-
-        function disconnect() {
-            stompClient.disconnect();
-            setConnected(false);
-        }
-
-        function sendMessage() {
-            var message = document.getElementById('message').value;
-            var channel = document.getElementById('channel').value;
-            stompClient.send("/app/message/" + encodeURIComponent(channel), {},
-                    JSON.stringify({ 'message': encodeURIComponent(message) }));
-        }
-
-        function showGreeting(message) {
-            var response = document.getElementById('response');
-            var p = document.createElement('p');
-            p.style.wordWrap = 'break-word';
-            p.style.margin = '0px';
-            p.style.padding = '0px';
-            p.appendChild(document.createTextNode(message));
-            response.appendChild(p);
-        }
-        function showNicknames(nicknames) {
-            var response = document.getElementById('nicknames');
-            response.innerHTML = '';
-            for (var nickname in nicknames) {
-                var p = document.createElement('p');
-                p.style.wordWrap = 'break-word';
-                p.style.margin = '0px';
-                p.style.padding = '0px';
-                p.appendChild(document.createTextNode(nickname));
-                response.appendChild(p);
-            }
-        }
-    </script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
     enabled. Please enable
     Javascript and reload this page!</h2></noscript>
-<div>
+<div ng-app="" ng-controller="ChatController">
     <div>
-        <input type="text" id="nickname" placeholder="nickname" required=""/>
-        <input type="text" id="channel" placeholder="channel" required=""/>
-        <button id="connect" onclick="connect();">Connect</button>
-        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+        <input ng-model="ctrl.nickname" ng-disabled="ctrl.connected" type="text" id="nickname" placeholder="nickname"
+               required=""/>
+        <input ng-model="ctrl.channel" ng-disabled="ctrl.connected" type="text" id="channel" placeholder="channel"
+               required=""/>
+        <button id="connect" ng-click="connect()" ng-disabled="ctrl.connected">Connect</button>
+        <button id="disconnect" ng-disabled="!ctrl.connected" ng-click="disconnect()">Disconnect</button>
+        <label><input type="checkbox" ng-model="ctrl.notify"/>Notify</label>
     </div>
     <div id="chat-panel">
         <table id="chat-table">
             <tr>
                 <td id="recipient">
-                    <p id="nicknames"></p>
+                    <ul>
+                        <li ng-repeat="(nickname, v) in nicknames">{{nickname}}</li>
+                    </ul>
                 </td>
                 <td id="chat">
                     <div id="#chat-windows">
                         <div class="chat-window">
-                            <p id="response"></p>
+                            <p ng-repeat='message in messages'><strong>{{message.nickname.value}}</strong> &gt; <span>{{message.message}}</span>
+                            </p>
                         </div>
                     </div>
                 </td>
             </tr>
-            <tr id="conversationDiv" style="visibility: hidden">
+            <tr id="conversationDiv">
                 <td id="input-cell" colspan="2">
-                    <label>Message: </label><input type="text" id="message" size="80"/>
-                    <button id="sendName" onclick="sendMessage();">Send</button>
+                    <label>Message: </label><input ng-model="text" ng-disabled="!ctrl.connected" type="text"
+                                                   id="message" size="80"/>
+                    <button id="sendName" ng-click="sendMessage()" ng-disabled="!ctrl.connected">Send</button>
                 </td>
             </tr>
         </table>
     </div>
 </div>
+<script src="vendor/angular/angular.min.js"></script>
+<script src="vendor/sockjs/sockjs.js"></script>
+<script src="vendor/stomp-websocket/lib/stomp.js"></script>
+<script type="text/javascript">
+    var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+    if (Notification) {
+        Notification.requestPermission(function (permission) {
+        });
+    }
+    function ChatController($scope) {
+        $scope.ctrl = {
+            connected: false,
+            nickname: '',
+            channel: '',
+            notify: false
+        };
+        $scope.nicknames = {};
+        $scope.messages = [];
+        $scope.text = '';
+        $scope.stompClient = null;
+        $scope.connect = function () {
+            var nickname = $scope.ctrl.nickname;
+            var channel = $scope.ctrl.channel;
+
+            if (!(nickname && channel)) {
+                alert('enter nickname and channel!');
+                return;
+            }
+
+            var socket = new SockJS('/chat');
+            $scope.stompClient = Stomp.over(socket);
+            $scope.stompClient.connect({}, function (frame) {
+                $scope.ctrl.connected = true;
+                $scope.stompClient.subscribe('/topic/message/' + encodeURIComponent(channel),
+                        function (res) {
+                            var message = JSON.parse(res.body);
+                            $scope.messages.push(message);
+                            if ($scope.ctrl.notify && Notification) {
+                                var from = message.nickname.value;
+                                if (from != nickname) {
+                                    var title = from + ' @ ' + message.channelName.value;
+                                    new Notification(title, {body: message.message});
+                                }
+                            }
+                            $scope.$apply();
+                        });
+                $scope.stompClient.subscribe('/app/join/' + encodeURIComponent(channel) + '/' + encodeURIComponent(nickname),
+                        function (participants) {
+                            console.log(participants);
+                            JSON.parse(participants.body).forEach(function (partiticant) {
+                                $scope.nicknames[partiticant.value] = true;
+                            });
+                            $scope.$apply();
+                        });
+                $scope.stompClient.subscribe('/topic/join/' + encodeURIComponent(channel), function (nickname) {
+                    $scope.nicknames[JSON.parse(nickname.body).value] = true;
+                    $scope.$apply();
+                });
+                $scope.stompClient.subscribe('/topic/leave/' + encodeURIComponent(channel), function (nickname) {
+                    delete $scope.nicknames[JSON.parse(nickname.body).value];
+                    $scope.$apply();
+                });
+                $scope.$apply();
+            });
+        };
+
+        $scope.disconnect = function () {
+            $scope.stompClient.disconnect();
+            $scope.ctrl.connected = false;
+            $scope.messages = [];
+            $scope.nicknames = {};
+            $scope.stompClient = null;
+        };
+
+        $scope.sendMessage = function () {
+            var message = $scope.text;
+            var channel = $scope.ctrl.channel;
+            $scope.stompClient.send("/app/message/" + encodeURIComponent(channel), {},
+                    JSON.stringify({ 'message': encodeURIComponent(message) }));
+            $scope.text = '';
+        }
+
+        $scope.debug = function () {
+            console.log($scope);
+        }
+    }
+</script>
 </body>
 </html>
